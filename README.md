@@ -51,7 +51,7 @@ module "pgdog" {
   pgdog = {
     # PgDog version.
     image_tag = "v0.1.29"
-    
+
     # Configure any pgdog.toml settings directly in TF.
     general = {
       workers = 2
@@ -170,6 +170,7 @@ aurora_clusters = [
 | `users[].server_user` | Username for connecting to the backend database (if different) | `string` | `null` | no |
 | `users[].server_password_secret_arn` | ARN of secret for backend database password (if different) | `string` | `null` | no |
 | `users[].pool_size` | Connection pool size for this user | `number` | `10` | no |
+| `users[].statement_timeout` | `statement_timeout` set for this user's connections | `number` | `null` | no |
 | `users[].pooler_mode` | Pooler mode (transaction/session/statement) | `string` | `transaction` | no |
 
 ```hcl

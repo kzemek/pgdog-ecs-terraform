@@ -31,6 +31,7 @@ locals {
         cluster_identifier = cluster.cluster_identifier
         database_name      = cluster.database_name
         pool_size          = cluster.pool_size
+        statement_timeout  = cluster.statement_timeout
         shard              = cluster.shard
       }
     }
@@ -48,10 +49,11 @@ locals {
   # Process RDS instances - detect primary/replica status
   rds_databases = [
     for db in var.rds_instances : {
-      name      = db.database_name
-      host      = data.aws_db_instance.this[db.identifier].address
-      port      = data.aws_db_instance.this[db.identifier].port
-      pool_size = db.pool_size
+      name              = db.database_name
+      host              = data.aws_db_instance.this[db.identifier].address
+      port              = data.aws_db_instance.this[db.identifier].port
+      pool_size         = db.pool_size
+      statement_timeout = db.statement_timeout
       role = (
         db.role != "auto" ? db.role :
         # Auto-detect: if replicate_source_db is set, it's a replica
@@ -66,13 +68,14 @@ locals {
   # Role is "auto" - PgDog detects primary/replica via LSN checking
   aurora_databases = var.create_resources ? [
     for instance_id, instance in data.aws_db_instance.aurora : {
-      name       = local.aurora_instance_configs[instance_id].database_name
-      host       = instance.address
-      port       = instance.port
-      pool_size  = local.aurora_instance_configs[instance_id].pool_size
-      role       = "auto"
-      identifier = instance_id
-      shard      = local.aurora_instance_configs[instance_id].shard
+      name              = local.aurora_instance_configs[instance_id].database_name
+      host              = instance.address
+      port              = instance.port
+      pool_size         = local.aurora_instance_configs[instance_id].pool_size
+      statement_timeout = local.aurora_instance_configs[instance_id].statement_timeout
+      role              = "auto"
+      identifier        = instance_id
+      shard             = local.aurora_instance_configs[instance_id].shard
     }
   ] : []
 
@@ -82,13 +85,14 @@ locals {
   # Process direct database inputs
   direct_databases = [
     for db in var.databases : {
-      name       = db.name
-      host       = db.host
-      port       = db.port
-      pool_size  = db.pool_size
-      role       = db.role
-      shard      = db.shard
-      identifier = "${db.name}-${db.role}-${db.shard}"
+      name              = db.name
+      host              = db.host
+      port              = db.port
+      pool_size         = db.pool_size
+      statement_timeout = db.statement_timeout
+      role              = db.role
+      shard             = db.shard
+      identifier        = "${db.name}-${db.role}-${db.shard}"
     }
   ]
 

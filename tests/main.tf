@@ -20,12 +20,13 @@ variable "test_name" {
 variable "databases" {
   description = "Mock database configurations"
   type = list(object({
-    name      = string
-    host      = string
-    port      = optional(number, 5432)
-    pool_size = optional(number)
-    role      = optional(string, "primary")
-    shard     = optional(number, 0)
+    name              = string
+    host              = string
+    port              = optional(number, 5432)
+    pool_size         = optional(number)
+    statement_timeout = optional(number)
+    role              = optional(string, "primary")
+    shard             = optional(number, 0)
   }))
   default = []
 }
@@ -39,6 +40,7 @@ variable "users" {
     server_user                = optional(string)
     server_password_secret_arn = optional(string)
     pool_size                  = optional(number)
+    statement_timeout          = optional(number)
     pooler_mode                = optional(string, "transaction")
     read_only                  = optional(bool, false)
   }))
